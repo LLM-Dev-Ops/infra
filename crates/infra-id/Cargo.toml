@@ -1,0 +1,35 @@
+[package]
+name = "infra-id"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+description = "ID generation utilities for LLM-Dev-Ops infrastructure"
+keywords = ["id", "uuid", "ulid", "llm"]
+categories = ["development-tools"]
+
+[features]
+default = ["std"]
+std = []
+wasm = ["wasm-bindgen", "js-sys", "getrandom/js"]
+
+[dependencies]
+infra-errors = { workspace = true }
+uuid = { workspace = true }
+ulid = { workspace = true }
+rand = { workspace = true }
+serde = { workspace = true }
+chrono = { workspace = true }
+
+# WASM
+wasm-bindgen = { workspace = true, optional = true }
+js-sys = { workspace = true, optional = true }
+getrandom = { workspace = true, optional = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["rt-multi-thread", "macros"] }
+
+[lints]
+workspace = true

@@ -1,0 +1,36 @@
+[package]
+name = "infra-errors"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+description = "Unified error handling for LLM-Dev-Ops infrastructure"
+keywords = ["errors", "llm", "infrastructure"]
+categories = ["development-tools"]
+readme = "README.md"
+
+[features]
+default = ["std"]
+std = ["rand"]
+wasm = ["wasm-bindgen", "js-sys", "serde-wasm-bindgen"]
+
+[dependencies]
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+chrono = { workspace = true }
+uuid = { workspace = true }
+rand = { version = "0.8", optional = true }
+
+# Optional WASM support
+wasm-bindgen = { workspace = true, optional = true }
+js-sys = { workspace = true, optional = true }
+serde-wasm-bindgen = { workspace = true, optional = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["rt-multi-thread", "macros"] }
+
+[lints]
+workspace = true

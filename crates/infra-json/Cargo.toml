@@ -1,0 +1,32 @@
+[package]
+name = "infra-json"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+description = "JSON utilities for LLM-Dev-Ops infrastructure"
+keywords = ["json", "llm", "infrastructure"]
+categories = ["encoding"]
+
+[features]
+default = ["std"]
+std = []
+wasm = ["wasm-bindgen", "js-sys", "serde-wasm-bindgen"]
+
+[dependencies]
+infra-errors = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# WASM
+wasm-bindgen = { workspace = true, optional = true }
+js-sys = { workspace = true, optional = true }
+serde-wasm-bindgen = { workspace = true, optional = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["rt-multi-thread", "macros"] }
+
+[lints]
+workspace = true

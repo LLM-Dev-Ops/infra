@@ -1,0 +1,27 @@
+[package]
+name = "infra-router"
+version = "0.1.0"
+edition = "2021"
+description = "API routing and gateway for LLM-Dev-Ops infrastructure"
+license = "LicenseRef-LLM-Dev-Ops"
+repository = "https://github.com/llm-dev-ops/infra"
+
+[features]
+default = []
+
+[dependencies]
+infra-errors = { path = "../infra-errors" }
+infra-otel = { path = "../infra-otel" }
+infra-http = { path = "../infra-http" }
+infra-auth = { path = "../infra-auth" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+async-trait = "0.1"
+thiserror = "1.0"
+tokio = { version = "1.40", features = ["sync"] }
+tracing = "0.1"
+regex = "1.10"
+rand = "0.8"
+
+[dev-dependencies]
+tokio = { version = "1.40", features = ["rt-multi-thread", "macros"] }

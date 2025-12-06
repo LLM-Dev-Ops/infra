@@ -1,0 +1,31 @@
+[package]
+name = "infra-otel"
+version = "0.1.0"
+edition = "2021"
+description = "OpenTelemetry integration for LLM-Dev-Ops infrastructure"
+license = "LicenseRef-LLM-Dev-Ops"
+repository = "https://github.com/llm-dev-ops/infra"
+
+[features]
+default = ["tracing", "metrics"]
+tracing = []
+metrics = []
+jaeger = ["opentelemetry-jaeger"]
+otlp = ["opentelemetry-otlp"]
+
+[dependencies]
+infra-errors = { path = "../infra-errors" }
+opentelemetry = "0.27"
+opentelemetry_sdk = { version = "0.27", features = ["rt-tokio"] }
+opentelemetry-semantic-conventions = "0.27"
+opentelemetry-jaeger = { version = "0.22", optional = true }
+opentelemetry-otlp = { version = "0.27", optional = true }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+tracing-opentelemetry = "0.28"
+serde = { version = "1.0", features = ["derive"] }
+thiserror = "1.0"
+tokio = { version = "1.40", features = ["rt"] }
+
+[dev-dependencies]
+tokio = { version = "1.40", features = ["rt-multi-thread", "macros"] }
