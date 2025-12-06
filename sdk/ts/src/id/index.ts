@@ -117,7 +117,6 @@ export function nanoid(size = 21, alphabet = NANOID_ALPHABET): string {
   const mask = (2 << (Math.log2(alphabet.length - 1) | 0)) - 1;
   const step = Math.ceil((1.6 * mask * size) / alphabet.length);
 
-  let i = 0;
   while (result.length < size) {
     const randomBytes = new Uint8Array(step);
     crypto.getRandomValues(randomBytes);

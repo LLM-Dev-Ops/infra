@@ -33,7 +33,7 @@ export async function hash(
   }
 
   const hashName = algorithm.toUpperCase().replace('SHA', 'SHA-');
-  const hashBuffer = await crypto.subtle.digest(hashName, buffer);
+  const hashBuffer = await crypto.subtle.digest(hashName, buffer.slice().buffer);
   return new Uint8Array(hashBuffer);
 }
 
@@ -73,7 +73,7 @@ export async function exportKey(key: CryptoKey): Promise<Uint8Array> {
 export async function importKey(keyBytes: Uint8Array): Promise<CryptoKey> {
   return crypto.subtle.importKey(
     'raw',
-    keyBytes,
+    keyBytes.slice().buffer,
     { name: 'AES-GCM', length: 256 },
     true,
     ['encrypt', 'decrypt']
@@ -93,7 +93,7 @@ export async function encrypt(
   const ciphertext = await crypto.subtle.encrypt(
     { name: 'AES-GCM', iv },
     key,
-    data
+    data.slice().buffer
   );
 
   // Prepend IV to ciphertext
