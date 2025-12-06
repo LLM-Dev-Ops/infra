@@ -1,1 +1,22 @@
-node_modules
+# Dependencies
+node_modules/
+
+# Rust build artifacts
+target/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude flow state
+.claude-flow/
+
+# Lock files (optional - uncomment if you want to ignore)
+# package-lock.json
+# Cargo.lock
