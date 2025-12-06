@@ -21,6 +21,22 @@
     "./json": {
       "import": "./dist/json/index.js",
       "types": "./dist/json/index.d.ts"
+    },
+    "./llm-client": {
+      "import": "./dist/llm-client/index.js",
+      "types": "./dist/llm-client/index.d.ts"
+    },
+    "./retry": {
+      "import": "./dist/retry/index.js",
+      "types": "./dist/retry/index.d.ts"
+    },
+    "./cache": {
+      "import": "./dist/cache/index.js",
+      "types": "./dist/cache/index.d.ts"
+    },
+    "./rate-limit": {
+      "import": "./dist/rate-limit/index.js",
+      "types": "./dist/rate-limit/index.d.ts"
     }
   },
   "files": [

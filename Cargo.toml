@@ -16,6 +16,10 @@ members = [
     "crates/infra-vector",
     "crates/infra-auth",
     "crates/infra-router",
+    "crates/infra-llm-client",
+    "crates/infra-cache",
+    "crates/infra-retry",
+    "crates/infra-rate-limit",
 ]
 
 [workspace.package]
@@ -45,6 +49,10 @@ infra-sim = { path = "crates/infra-sim", version = "0.1.0" }
 infra-vector = { path = "crates/infra-vector", version = "0.1.0" }
 infra-auth = { path = "crates/infra-auth", version = "0.1.0" }
 infra-router = { path = "crates/infra-router", version = "0.1.0" }
+infra-llm-client = { path = "crates/infra-llm-client", version = "0.1.0" }
+infra-cache = { path = "crates/infra-cache", version = "0.1.0" }
+infra-retry = { path = "crates/infra-retry", version = "0.1.0" }
+infra-rate-limit = { path = "crates/infra-rate-limit", version = "0.1.0" }
 
 # Async runtime
 tokio = { version = "1.35", features = ["full"] }

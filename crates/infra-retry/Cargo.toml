@@ -1,0 +1,29 @@
+[package]
+name = "infra-retry"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+description = "Advanced retry policies for LLM-Dev-Ops infrastructure"
+keywords = ["retry", "backoff", "resilience", "fault-tolerance"]
+categories = ["asynchronous", "development-tools"]
+readme = "README.md"
+
+[features]
+default = ["std"]
+std = []
+
+[dependencies]
+async-trait = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["time"] }
+rand = { workspace = true }
+infra-errors = { path = "../infra-errors" }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["rt-multi-thread", "macros"] }
+
+[lints]
+workspace = true

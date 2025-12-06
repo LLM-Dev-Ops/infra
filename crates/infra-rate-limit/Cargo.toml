@@ -1,0 +1,30 @@
+[package]
+name = "infra-rate-limit"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+description = "Rate limiting utilities for LLM-Dev-Ops infrastructure"
+keywords = ["rate-limit", "throttle", "token-bucket", "api"]
+categories = ["web-programming", "asynchronous"]
+readme = "README.md"
+
+[features]
+default = ["std"]
+std = []
+
+[dependencies]
+async-trait = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["time", "sync"] }
+parking_lot = { workspace = true }
+dashmap = { workspace = true }
+infra-errors = { path = "../infra-errors" }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["rt-multi-thread", "macros"] }
+
+[lints]
+workspace = true

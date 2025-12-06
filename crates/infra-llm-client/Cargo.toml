@@ -1,0 +1,30 @@
+[package]
+name = "infra-llm-client"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+description = "Unified LLM provider abstraction for LLM-Dev-Ops infrastructure"
+keywords = ["llm", "ai", "provider", "anthropic", "openai"]
+categories = ["api-bindings", "asynchronous"]
+readme = "README.md"
+
+[features]
+default = ["std"]
+std = []
+
+[dependencies]
+async-trait = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+futures = { workspace = true }
+infra-errors = { path = "../infra-errors" }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["rt-multi-thread", "macros"] }
+
+[lints]
+workspace = true
