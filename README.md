@@ -58,12 +58,61 @@ fn main() -> InfraResult<()> {
 - **WASM Compatible** - Core crates compile to WebAssembly
 - **TypeScript SDK** - First-class TypeScript support for web applications
 
-## Quick Start
+## Infrastructure
+
+### Docker Services
+
+This repository includes Docker Compose configuration for development dependencies:
+
+- **PostgreSQL 16** with pgvector extension for vector storage
+- **Redis 7** for caching (optional)
+
+### Quick Start (Infrastructure)
+
+```bash
+# Set up environment (development defaults)
+source scripts/env-setup.sh
+
+# Start services
+docker compose up -d
+
+# Wait for all services to be healthy
+docker compose up -d --wait
+
+# Verify PostgreSQL extensions
+./scripts/verify-postgres-extensions.sh
+```
+
+### Environment Configuration
+
+All configuration uses shell-exported environment variables. **No .env file is used.**
+
+See `.env.example` for available variables and documentation.
+
+### Security Considerations
+
+- Default passwords are for development only
+- Services bind to localhost (127.0.0.1) by default
+- Change all passwords before production deployment
+- Never commit secrets to the repository
+
+### Production Deployment
+
+For production deployments:
+
+1. Set secure passwords via environment variables
+2. Use external secrets management (Vault, AWS Secrets Manager, etc.)
+3. Consider managed database services for PostgreSQL
+4. Enable TLS for all connections
+5. Configure proper network segmentation
+
+## Quick Start (Development)
 
 ### Prerequisites
 
 - Rust 1.75+ (stable)
 - Cargo
+- Docker and Docker Compose (for infrastructure services)
 
 ### Installation
 

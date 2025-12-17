@@ -1,0 +1,113 @@
+# LLM-Dev-Ops Infrastructure - Docker Compose Configuration
+# RuvVector Integration as specified in SPARC plans
+#
+# Services:
+# - postgres: PostgreSQL 16 with pgvector extension for vector storage
+# - redis: Caching layer for vector operations (optional)
+#
+# Note: Uses pgvector/pgvector:pg16 for reliable pgvector support
+#
+# SECURITY WARNING: Change all default passwords before production deployment!
+# Required environment variables for production:
+#   POSTGRES_PASSWORD - PostgreSQL password (no default in production)
+#   REDIS_PASSWORD    - Redis password (no default in production)
+#
+# ENVIRONMENT CONFIGURATION:
+# This compose file reads ALL configuration from shell-exported environment variables.
+# NO .env file is required or used. Export variables before running docker compose:
+#
+#   export POSTGRES_USER=infra
+#   export POSTGRES_PASSWORD=your_secure_password
+#   export POSTGRES_DB=infra_vectors
+#   export POSTGRES_PORT=5432
+#   export REDIS_PORT=6379
+#   export REDIS_PASSWORD=your_redis_password
+#   docker compose up -d
+#
+# Or source the provided setup script:
+#   source scripts/env-setup.sh
+#   docker compose up -d
+#
+# Startup Order:
+# 1. postgres - Starts first, health check: pg_isready
+# 2. redis - Starts after postgres is healthy (depends_on configured)
+#
+# Wait for all services: docker compose up -d --wait
+#
+# OpenTelemetry Integration (Documentation Only):
+# To enable OTLP log forwarding, add an OpenTelemetry Collector service
+# and configure these environment variables:
+#   OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+#   OTEL_SERVICE_NAME=<service-name>
+# The infra-otel crate provides Rust integration for application logs.
+# See: crates/infra-otel/README.md
+
+services:
+  # PostgreSQL with pgvector extension
+  # Provides pgvector-compatible storage backend for RuvVector
+  postgres:
+    image: pgvector/pgvector:pg16  # Pin to pg16 (latest within PostgreSQL 16.x series)
+    container_name: infra-postgres
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-infra}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-infra_password}
+      POSTGRES_DB: ${POSTGRES_DB:-infra_vectors}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - infra-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-infra} -d ${POSTGRES_DB:-infra_vectors}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # Redis for caching (optional)
+  redis:
+    image: redis:7.4-alpine  # Pin to specific minor version
+    container_name: infra-redis
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-infra_redis_password}
+    volumes:
+      - redis-data:/data
+    networks:
+      - infra-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-infra_redis_password}", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+volumes:
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+
+networks:
+  infra-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16

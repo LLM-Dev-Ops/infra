@@ -2,24 +2,65 @@
 name = "infra-vector"
 version = "0.1.0"
 edition = "2021"
-description = "Vector operations and embeddings for LLM-Dev-Ops infrastructure"
-license = "LicenseRef-LLM-Dev-Ops"
+rust-version = "1.75"
+description = "Vector database operations for LLM-Dev-Ops infrastructure"
+license = "MIT OR Apache-2.0"
 repository = "https://github.com/llm-dev-ops/infra"
+keywords = ["vector", "embeddings", "llm", "search", "ruvector"]
+categories = ["database"]
+readme = "README.md"
 
 [features]
-default = []
-wasm = ["wasm-bindgen", "js-sys"]
+default = ["std"]
+std = []
+# RuVector integration (from SPARC spec)
+# Enable when ruvector-core is available: ruvector = ["ruvector-core"]
+ruvector = []
+# WASM support via ruvector-gnn-wasm
+# Enable when ruvector-gnn-wasm is available: wasm = ["ruvector-gnn-wasm", "wasm-bindgen", "js-sys", "serde-wasm-bindgen"]
+wasm = ["wasm-bindgen", "js-sys", "serde-wasm-bindgen"]
+# Optional OpenTelemetry instrumentation
+otel = ["tracing"]
 
 [dependencies]
+# Internal crates
 infra-errors = { path = "../infra-errors" }
+infra-config = { path = "../infra-config", optional = true }
+
+# Core dependencies
+async-trait = "0.1"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 thiserror = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
 rand = "0.8"
+uuid = { version = "1.6", features = ["v4"] }
 
-# WASM dependencies
+# RuVector ecosystem (from SPARC spec: github.com/ruvnet/ruvector)
+# Using workspace dependencies for consistency
+# Uncomment when ruvector packages are published:
+# ruvector-core = { workspace = true, optional = true }
+
+# WASM support
+# Uncomment when ruvector-gnn-wasm is published:
+# ruvector-gnn-wasm = { workspace = true, optional = true }
 wasm-bindgen = { version = "0.2", optional = true }
 js-sys = { version = "0.3", optional = true }
+serde-wasm-bindgen = { version = "0.6", optional = true }
+
+# OpenTelemetry instrumentation (optional)
+tracing = { version = "0.1", optional = true }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+tokio = { version = "1.35", features = ["rt", "sync", "time"] }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen-futures = "0.4"
 
 [dev-dependencies]
 approx = "0.5"
+tokio = { version = "1.35", features = ["rt-multi-thread", "macros"] }
+tokio-test = "0.4"
+
+[lints]
+workspace = true

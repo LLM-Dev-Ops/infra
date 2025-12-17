@@ -33,6 +33,10 @@ keywords = ["llm", "infrastructure", "devops", "ai"]
 categories = ["development-tools", "web-programming"]
 
 [workspace.dependencies]
+# RuvNet ecosystem (from SPARC spec: github.com/ruvnet/ruvector)
+ruvector-core = { git = "https://github.com/ruvnet/ruvector", branch = "main" }
+ruvector-gnn-wasm = { git = "https://github.com/ruvnet/ruvector", branch = "main" }
+
 # Internal crates
 infra-errors = { path = "crates/infra-errors", version = "0.1.0" }
 infra-config = { path = "crates/infra-config", version = "0.1.0" }
