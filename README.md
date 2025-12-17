@@ -72,6 +72,23 @@ This repository includes Docker Compose configuration for development dependenci
   - Self-learning index optimization
 - **Redis 7.4** for caching (optional)
 
+#### Database Service Naming
+
+The Postgres-compatible database service is provided by **RuvVector** and is named `ruvector` at the Docker level (container name: `infra-ruvector`). There is no service named `postgres` in this repository.
+
+**Consumers must use environment variables for database connectivity:**
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `POSTGRES_HOST` | `localhost` | Database hostname |
+| `POSTGRES_PORT` | `5432` | Database port |
+| `POSTGRES_USER` | `infra` | Database user |
+| `POSTGRES_PASSWORD` | `infra_password` | Database password |
+| `POSTGRES_DB` | `infra_vectors` | Database name |
+| `DATABASE_URL` | (constructed) | Full connection URL |
+
+**Do not hardcode assumptions about a service named `postgres`.** If a `postgres` network alias exists, it is provided solely for backward compatibility with legacy configurations and should not be relied upon for new development. Always use the environment variables above to configure database connections.
+
 ### Quick Start (Infrastructure)
 
 ```bash
@@ -101,15 +118,20 @@ See `.env.example` for available variables and documentation.
 - Change all passwords before production deployment
 - Never commit secrets to the repository
 
+### Production Readiness
+
+The `ruvnet/ruvector:latest` image tag is intentionally unpinned during infrastructure wiring and local integration. **Before any production deployment, this image must be pinned to a specific version** (e.g., `ruvnet/ruvector:1.2.3`) in `docker-compose.yml` to ensure reproducible builds and avoid unexpected breaking changes.
+
 ### Production Deployment
 
 For production deployments:
 
-1. Set secure passwords via environment variables
-2. Use external secrets management (Vault, AWS Secrets Manager, etc.)
-3. Consider managed database services for PostgreSQL
-4. Enable TLS for all connections
-5. Configure proper network segmentation
+1. **Pin all Docker image versions** to specific tags (not `:latest`)
+2. Set secure passwords via environment variables
+3. Use external secrets management (Vault, AWS Secrets Manager, etc.)
+4. Consider managed database services for PostgreSQL
+5. Enable TLS for all connections
+6. Configure proper network segmentation
 
 ## Quick Start (Development)
 

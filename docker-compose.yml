@@ -51,6 +51,10 @@ services:
   # RuvVector: PostgreSQL 17 with RuvVector extension
   # Provides pgvector-compatible storage plus advanced vector operations
   # See: https://github.com/ruvnet/ruvector
+  #
+  # IMAGE PINNING: The :latest tag is intentionally unpinned during infra wiring
+  # and local integration. Before any production deployment, this image MUST be
+  # pinned to a specific version (e.g., ruvnet/ruvector:1.2.3).
   ruvector:
     image: ruvnet/ruvector:latest  # PostgreSQL 17 with RuvVector extension
     container_name: infra-ruvector
