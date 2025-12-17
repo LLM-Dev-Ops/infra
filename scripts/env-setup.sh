@@ -15,8 +15,14 @@
 #   source scripts/env-setup.sh  # Will not override existing exports
 
 # =============================================================================
-# PostgreSQL Configuration (with pgvector extension)
+# RuvVector/PostgreSQL Configuration
 # =============================================================================
+# Uses ruvnet/ruvector image (PostgreSQL 17 with RuvVector extension)
+# RuvVector provides pgvector-compatible 'vector' type plus advanced features:
+#   - Hyperbolic embeddings (Poincaré ball)
+#   - GNN operations (GCN, GraphSAGE)
+#   - Graph operations (Cypher queries)
+#   - Self-learning capabilities
 
 # PostgreSQL connection parameters
 export POSTGRES_HOST="${POSTGRES_HOST:-localhost}"
@@ -83,7 +89,7 @@ export RUST_BACKTRACE="${RUST_BACKTRACE:-1}"
 
 echo "Environment variables exported for LLM-Dev-Ops Infrastructure"
 echo ""
-echo "PostgreSQL:"
+echo "RuvVector/PostgreSQL:"
 echo "  POSTGRES_HOST=${POSTGRES_HOST}"
 echo "  POSTGRES_PORT=${POSTGRES_PORT}"
 echo "  POSTGRES_USER=${POSTGRES_USER}"

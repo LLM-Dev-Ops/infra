@@ -64,8 +64,13 @@ fn main() -> InfraResult<()> {
 
 This repository includes Docker Compose configuration for development dependencies:
 
-- **PostgreSQL 16** with pgvector extension for vector storage
-- **Redis 7** for caching (optional)
+- **RuvVector** (PostgreSQL 17 with RuvVector extension) - Advanced vector database
+  - pgvector-compatible `vector` type with HNSW indexing
+  - Hyperbolic embeddings (Poincaré ball) for hierarchical data
+  - GNN operations (GCN, GraphSAGE)
+  - Graph operations with Cypher queries
+  - Self-learning index optimization
+- **Redis 7.4** for caching (optional)
 
 ### Quick Start (Infrastructure)
 
@@ -79,7 +84,7 @@ docker compose up -d
 # Wait for all services to be healthy
 docker compose up -d --wait
 
-# Verify PostgreSQL extensions
+# Verify RuvVector extensions
 ./scripts/verify-postgres-extensions.sh
 ```
 

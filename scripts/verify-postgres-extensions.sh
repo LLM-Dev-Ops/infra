@@ -39,15 +39,15 @@ echo ""
 echo "Connection: ${POSTGRES_USER}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}"
 echo ""
 
-# Required extensions
-REQUIRED_EXTENSIONS=("vector" "uuid-ossp" "pg_trgm" "pgcrypto")
+# Core extensions (always required)
+CORE_EXTENSIONS=("uuid-ossp" "pg_trgm" "pgcrypto")
 
 # Check if psql is available
 if ! command -v psql &> /dev/null; then
     echo -e "${RED}Error: psql command not found. Install postgresql-client or use docker exec.${NC}"
     echo ""
     echo "Alternative: Run via Docker:"
-    echo "  docker exec infra-postgres psql -U \$POSTGRES_USER -d \$POSTGRES_DB -c \"SELECT extname, extversion FROM pg_extension;\""
+    echo "  docker exec infra-ruvector psql -U \$POSTGRES_USER -d \$POSTGRES_DB -c \"SELECT extname, extversion FROM pg_extension;\""
     exit 1
 fi
 
@@ -62,18 +62,37 @@ if ! run_sql "SELECT 1;" > /dev/null 2>&1; then
     echo -e "${RED}✗ Cannot connect to PostgreSQL${NC}"
     echo ""
     echo "Ensure the database is running:"
-    echo "  docker compose up -d postgres"
+    echo "  docker compose up -d ruvector"
     exit 1
 fi
 echo -e "${GREEN}✓ Database connection successful${NC}"
 echo ""
 
-# Check each required extension
-echo "Checking required extensions..."
-echo ""
+# Check for vector extension (ruvector or pgvector)
+echo "Checking vector extension..."
 ALL_OK=true
+VECTOR_EXT=""
 
-for ext in "${REQUIRED_EXTENSIONS[@]}"; do
+ruvector_result=$(run_sql "SELECT extversion FROM pg_extension WHERE extname = 'ruvector';")
+if [ -n "$ruvector_result" ]; then
+    echo -e "${GREEN}✓ ruvector${NC} (version: ${ruvector_result}) - Advanced vector database"
+    VECTOR_EXT="ruvector"
+else
+    pgvector_result=$(run_sql "SELECT extversion FROM pg_extension WHERE extname = 'vector';")
+    if [ -n "$pgvector_result" ]; then
+        echo -e "${GREEN}✓ pgvector${NC} (version: ${pgvector_result})"
+        VECTOR_EXT="pgvector"
+    else
+        echo -e "${RED}✗ No vector extension (ruvector or pgvector) found${NC}"
+        ALL_OK=false
+    fi
+fi
+
+echo ""
+
+# Check core extensions
+echo "Checking core extensions..."
+for ext in "${CORE_EXTENSIONS[@]}"; do
     result=$(run_sql "SELECT extversion FROM pg_extension WHERE extname = '${ext}';")
     if [ -n "$result" ]; then
         echo -e "${GREEN}✓ ${ext}${NC} (version: ${result})"
@@ -85,8 +104,8 @@ done
 
 echo ""
 
-# Verify pgvector functionality
-echo "Verifying pgvector functionality..."
+# Verify vector functionality (works with both ruvector and pgvector)
+echo "Verifying vector functionality..."
 if run_sql "SELECT '[1,2,3]'::vector(3);" > /dev/null 2>&1; then
     echo -e "${GREEN}✓ Vector type operational${NC}"
 else
@@ -142,11 +161,24 @@ else
     echo -e "${YELLOW}⚠ 'vectors' schema not found${NC}"
 fi
 
+# Check for RuvVector-specific features (if ruvector is installed)
+if [ "$VECTOR_EXT" = "ruvector" ]; then
+    echo ""
+    echo "Checking RuvVector-specific features..."
+    if run_sql "SELECT ruvector_version();" > /dev/null 2>&1; then
+        version=$(run_sql "SELECT ruvector_version();")
+        echo -e "${GREEN}✓ RuvVector version: ${version}${NC}"
+    else
+        echo -e "${YELLOW}⚠ RuvVector version function not available${NC}"
+    fi
+fi
+
 echo ""
 echo "============================================================"
 
 if [ "$ALL_OK" = true ]; then
     echo -e "${GREEN}All PostgreSQL extensions verified successfully!${NC}"
+    echo "Vector engine: ${VECTOR_EXT}"
     echo "The database is ready for RuvVector integration."
     exit 0
 else
@@ -154,7 +186,7 @@ else
     echo ""
     echo "To fix, ensure Docker init scripts ran correctly:"
     echo "  1. docker compose down -v  # Remove volumes to reset"
-    echo "  2. docker compose up -d postgres"
+    echo "  2. docker compose up -d ruvector"
     echo "  3. ./scripts/verify-postgres-extensions.sh"
     exit 1
 fi

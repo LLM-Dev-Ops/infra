@@ -2,10 +2,15 @@
 # RuvVector Integration as specified in SPARC plans
 #
 # Services:
-# - postgres: PostgreSQL 16 with pgvector extension for vector storage
+# - ruvector: PostgreSQL 17 with RuvVector extension (pgvector-compatible + advanced features)
 # - redis: Caching layer for vector operations (optional)
 #
-# Note: Uses pgvector/pgvector:pg16 for reliable pgvector support
+# Note: Uses ruvnet/ruvector for full RuvVector support including:
+#   - pgvector compatibility (vector type, HNSW indexes)
+#   - Hyperbolic embeddings (Poincaré ball)
+#   - GNN operations (GCN, GraphSAGE)
+#   - Graph operations (Cypher queries)
+#   - Self-learning capabilities
 #
 # SECURITY WARNING: Change all default passwords before production deployment!
 # Required environment variables for production:
@@ -29,8 +34,8 @@
 #   docker compose up -d
 #
 # Startup Order:
-# 1. postgres - Starts first, health check: pg_isready
-# 2. redis - Starts after postgres is healthy (depends_on configured)
+# 1. ruvector - Starts first, health check: pg_isready
+# 2. redis - Starts after ruvector is healthy (depends_on configured)
 #
 # Wait for all services: docker compose up -d --wait
 #
@@ -43,11 +48,12 @@
 # See: crates/infra-otel/README.md
 
 services:
-  # PostgreSQL with pgvector extension
-  # Provides pgvector-compatible storage backend for RuvVector
-  postgres:
-    image: pgvector/pgvector:pg16  # Pin to pg16 (latest within PostgreSQL 16.x series)
-    container_name: infra-postgres
+  # RuvVector: PostgreSQL 17 with RuvVector extension
+  # Provides pgvector-compatible storage plus advanced vector operations
+  # See: https://github.com/ruvnet/ruvector
+  ruvector:
+    image: ruvnet/ruvector:latest  # PostgreSQL 17 with RuvVector extension
+    container_name: infra-ruvector
     restart: unless-stopped
     ports:
       - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
@@ -61,7 +67,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-infra_password}
       POSTGRES_DB: ${POSTGRES_DB:-infra_vectors}
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - ruvector-data:/var/lib/postgresql/data
       - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
     networks:
       - infra-network
@@ -70,7 +76,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-      start_period: 10s
+      start_period: 30s
 
   # Redis for caching (optional)
   redis:
@@ -78,7 +84,7 @@ services:
     container_name: infra-redis
     restart: unless-stopped
     depends_on:
-      postgres:
+      ruvector:
         condition: service_healthy
     ports:
       - "127.0.0.1:${REDIS_PORT:-6379}:6379"
@@ -100,7 +106,7 @@ services:
       start_period: 5s
 
 volumes:
-  postgres-data:
+  ruvector-data:
     driver: local
   redis-data:
     driver: local
